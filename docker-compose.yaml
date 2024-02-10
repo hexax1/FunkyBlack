@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  jmusicbot:
+    build: .
+    container_name: JMusicBot
+    restart: unless-stopped
+    volumes:
+     - ./config:/jmb/config

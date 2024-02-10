@@ -1,3 +1,7 @@
 .git
 .circleci
 .github
+.idea
+target
+config
+docker-compose.yaml

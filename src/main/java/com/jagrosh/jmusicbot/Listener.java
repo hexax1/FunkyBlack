@@ -15,6 +15,7 @@
  */
 package com.jagrosh.jmusicbot;
 
+import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.utils.OtherUtil;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.JDA;
@@ -84,6 +85,23 @@ public class Listener extends ListenerAdapter
                 }
                 catch(Exception ex) {} // ignored
             }, 0, 24, TimeUnit.HOURS);
+            bot.getThreadpool().scheduleWithFixedDelay(() -> {
+                Logger log = LoggerFactory.getLogger("MusicBot");
+                log.info("Checking for Empty Channels...");
+                try {
+                    bot.getJDA().getGuilds().forEach(g -> {
+                        VoiceChannel connectedChannel = g.getAudioManager().getConnectedChannel();
+                        if(connectedChannel == null) return;
+                        log.info(connectedChannel.getMembers().toString());
+                        if(connectedChannel.getMembers().size() <= 1) {
+                            // disconnect bot if no other members are in the channel
+                            ((AudioHandler)g.getAudioManager().getSendingHandler()).stopAndClear();
+                            g.getAudioManager().closeAudioConnection();
+                        }
+                    });
+                }
+                catch(Exception ex) { log.error("Benny, dein Fehler: " + ex); } // ignored
+            }, 0, 2, TimeUnit.MINUTES);
         }
     }
     
